@@ -18,12 +18,15 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb; //RigidBody2D variable to control rigidbody2d via script
     private int extraJumps; //variable to check extra jumps
 
+    private Animator anim;
+
     // Start is called before the first frame update
     void Start()
     {
         //tweak player rigid body thru script
         rb = GetComponent<Rigidbody2D>();
         psrite = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
 
         extraJumps = extraJumpValue;
     }
@@ -52,24 +55,42 @@ public class PlayerController : MonoBehaviour
             psrite.flipX = true;
         }
 
-        
+        //code for running animation
+        if (playerMoveInput == 0)
+        {
+            anim.SetBool("isRunning", false);
+        } else
+        {
+            anim.SetBool("isRunning", true);
+        }
     }
+
 
     void playerJump()
     {
         if(isGrounded == true)
         {
             extraJumps = extraJumpValue;
+            anim.SetBool("isLanding", true);
+            anim.SetBool("isFalling", false);
+        }
+        else
+        {
+            anim.SetBool("isJumping", false);
+            anim.SetBool("isFalling", true);
         }
 
-        if (Input.GetKeyDown(KeyCode.UpArrow) && extraJumps > 0)
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            rb.velocity = Vector2.up * playerJumpForce;
-            extraJumps--;
-        }
-        else if (Input.GetKeyDown(KeyCode.UpArrow) && extraJumps == 0 && isGrounded == true)
-        {
-            rb.velocity = Vector2.up * playerJumpForce;
+            anim.SetBool("isJumping", true);
+            if (extraJumps > 0)
+            {
+                rb.velocity = Vector2.up * playerJumpForce;
+                extraJumps--;
+            } else if (extraJumps == 0 && isGrounded == true)
+            {
+                rb.velocity = Vector2.up * playerJumpForce;
+            }
         }
     }
 
